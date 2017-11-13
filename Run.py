@@ -20,12 +20,13 @@ def tick(keys):
     scoredisplay = gamebox.from_text(0, 0, "SCORE: " + str(ticks // 30), "Arial", 14, "red", italic=True)
     scoredisplay.top = camera.top
     scoredisplay.right = camera.right
-<<<<<<< HEAD
     camera.clear("blue")
-
-
-=======
->>>>>>> f4da853ca0fbdf14b7cce9060bce1bc06b2a0fb7
+    camera.draw(scoredisplay)
+    global playeroneimage, playerone, yspeed
+    camera.clear(gamebox.from_image(0,0, "https://pixabay.com/photo-1825469/"))
+    yspeed = playerone.yspeed
+    playerone = gamebox.from_image(playerone.x, playerone.y, playeroneimage)
+    playerone.yspeed = yspeed
 
     if pygame.K_UP in keys and playerone.touches(background):
         playerone.yspeed = -10
