@@ -28,9 +28,10 @@ def tick(keys):
 
     if pygame.K_DOWN in keys and playerone.bottom_touches(background):
         playeroneimage = 'Goku-crouch.png'
-        playerone.y = background.y -2
+        playerone.y = background.y - 30
     elif pygame.K_DOWN not in keys and playerone.bottom_touches(background):
         playeroneimage = 'Goku-1.png'
+
     if pygame.K_RIGHT in keys and pygame.K_DOWN not in keys:
         playerone.x += 4
 
@@ -48,12 +49,9 @@ def tick(keys):
         playerone.move_to_stop_overlapping(background)
 
     camera.draw(backgroundscreen)
-    #camera.draw(background)
     camera.draw(scoredisplay)
     camera.draw(playerone)
     camera.display()
-
-
 
 ticks_per_second = 60
 gamebox.timer_loop(ticks_per_second, tick)
