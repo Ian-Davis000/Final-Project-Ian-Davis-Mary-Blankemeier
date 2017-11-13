@@ -23,12 +23,9 @@ def tick(keys):
     scoredisplay.top = camera.top
     scoredisplay.right = camera.right
     camera.clear("blue")
-<<<<<<< HEAD
-=======
-    yspeed = playerone.yspeed
-    playerone = gamebox.from_image(playerone.x, playerone.y, playeroneimage)
-    playerone.yspeed = yspeed
->>>>>>> 1d0a0f7ab1e29e96c8a709984c16ad84c6397f2a
+    camera.draw(scoredisplay)
+    global playeroneimage, playerone, yspeed
+    camera.clear(gamebox.from_image(0,0, "sea-water-ocean-storm.jpg"))
 
     if pygame.K_UP in keys and playerone.touches(background):
         playerone.yspeed = -10
