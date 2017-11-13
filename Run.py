@@ -22,7 +22,7 @@ def tick(keys):
     scoredisplay.right = camera.right
     camera.draw(scoredisplay)
     global playeroneimage, playerone, yspeed
-    camera.clear("black")
+    camera.clear(gamebox.from_image(0,0, "https://pixabay.com/photo-1825469/")
     yspeed = playerone.yspeed
     playerone = gamebox.from_image(playerone.x, playerone.y, playeroneimage)
     playerone.yspeed = yspeed
