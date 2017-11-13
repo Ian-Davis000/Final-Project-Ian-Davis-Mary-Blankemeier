@@ -7,11 +7,13 @@ import math
 CAMERA_WIDTH, CAMERA_HEIGHT = 1000, 600
 camera = gamebox.Camera(CAMERA_WIDTH, CAMERA_HEIGHT)
 playeroneimage = 'Goku-1.png'
-playerone = gamebox.from_image(300, 400, playeroneimage)
+playerone = gamebox.from_image(300, 300, playeroneimage)
 playerone.scale_by(1.75)
-background = gamebox.from_color(500, 500, "green", 700, 50)
+background = gamebox.from_color(500, 435, "green", 700, 50)
 ticks = 0
 music = gamebox.load_sound("https://upload.wikimedia.org/wikipedia/commons/3/3c/Beat_electronic.ogg")
+backgroundscreen = gamebox.from_image(500,500, "wall-1825469_1920.png")
+backgroundscreen.scale_by(.55)
 
 def tick(keys):
     global playeroneimage, playerone, yspeed, ticks
@@ -21,12 +23,6 @@ def tick(keys):
     scoredisplay.top = camera.top
     scoredisplay.right = camera.right
     camera.clear("blue")
-    camera.draw(scoredisplay)
-    global playeroneimage, playerone, yspeed
-    camera.clear(gamebox.from_image(0,0, "https://pixabay.com/photo-1825469/"))
-    yspeed = playerone.yspeed
-    playerone = gamebox.from_image(playerone.x, playerone.y, playeroneimage)
-    playerone.yspeed = yspeed
 
     if pygame.K_UP in keys and playerone.touches(background):
         playerone.yspeed = -10
@@ -36,14 +32,15 @@ def tick(keys):
         playerone.y = background.y -2
     elif pygame.K_DOWN not in keys and playerone.touches(background):
         playeroneimage = 'Goku-1.png'
-    if pygame.K_RIGHT in keys:
+    if pygame.K_RIGHT in keys and pygame.K_DOWN not in keys:
         playerone.x += 4
 
-    if pygame.K_LEFT in keys:
+    if pygame.K_LEFT in keys and pygame.K_DOWN not in keys:
         playerone.x += -4
 
     yspeed = playerone.yspeed
     playerone = gamebox.from_image(playerone.x, playerone.y, playeroneimage)
+    playerone.scale_by(1.75)
     playerone.yspeed = yspeed
 
     playerone.yspeed += .5
@@ -51,9 +48,9 @@ def tick(keys):
     if playerone.touches(background):
         playerone.move_to_stop_overlapping(background)
 
-
+    camera.draw(backgroundscreen)
+    #camera.draw(background)
     camera.draw(scoredisplay)
-    camera.draw(background)
     camera.draw(playerone)
     camera.display()
 
