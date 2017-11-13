@@ -9,11 +9,11 @@ camera = gamebox.Camera(CAMERA_WIDTH, CAMERA_HEIGHT)
 playeroneimage = 'Goku-1.png'
 playerone = gamebox.from_image(300, 300, playeroneimage)
 playerone.scale_by(1.75)
-background = gamebox.from_color(500, 435, "green", 700, 50)
 ticks = 0
+background = gamebox.from_color(500, 460, "green", 2000, 50)
 music = gamebox.load_sound("https://upload.wikimedia.org/wikipedia/commons/3/3c/Beat_electronic.ogg")
-backgroundscreen = gamebox.from_image(500,500, "wall-1825469_1920.png")
-backgroundscreen.scale_by(.55)
+backgroundscreen = gamebox.from_image(550,400, "sea-water-ocean-storm.jpg")
+backgroundscreen.scale_by(1)
 
 def tick(keys):
     global playeroneimage, playerone, yspeed, ticks
