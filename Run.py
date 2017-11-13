@@ -26,10 +26,10 @@ def tick(keys):
     if pygame.K_UP in keys and playerone.touches(background):
         playerone.yspeed = -10
 
-    if pygame.K_DOWN in keys and playerone.y <= background.y:
+    if pygame.K_DOWN in keys and playerone.y >= background.y:
         playeroneimage = 'Goku-crouch.png'
         playerone.y = background.y -2
-    elif pygame.K_DOWN not in keys and playerone.y <= background.y:
+    elif pygame.K_DOWN not in keys and playerone.y >= background.y:
         playeroneimage = 'Goku-1.png'
     if pygame.K_RIGHT in keys and pygame.K_DOWN not in keys:
         playerone.x += 4
