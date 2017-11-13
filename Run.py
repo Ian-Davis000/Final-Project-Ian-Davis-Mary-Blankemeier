@@ -22,18 +22,14 @@ def tick(keys):
     scoredisplay = gamebox.from_text(0, 0, "SCORE: " + str(ticks // 30), "Arial", 14, "red", italic=True)
     scoredisplay.top = camera.top
     scoredisplay.right = camera.right
-    camera.clear("blue")
-    camera.draw(scoredisplay)
-    global playeroneimage, playerone, yspeed
-    camera.clear(gamebox.from_image(0,0, "sea-water-ocean-storm.jpg"))
 
     if pygame.K_UP in keys and playerone.touches(background):
         playerone.yspeed = -10
 
-    if pygame.K_DOWN in keys and playerone.touches(background):
+    if pygame.K_DOWN in keys and playerone.y <= background.y:
         playeroneimage = 'Goku-crouch.png'
         playerone.y = background.y -2
-    elif pygame.K_DOWN not in keys and playerone.touches(background):
+    elif pygame.K_DOWN not in keys and playerone.y <= background.y:
         playeroneimage = 'Goku-1.png'
     if pygame.K_RIGHT in keys and pygame.K_DOWN not in keys:
         playerone.x += 4
