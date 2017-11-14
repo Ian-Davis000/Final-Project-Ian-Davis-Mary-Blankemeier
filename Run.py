@@ -20,6 +20,8 @@ status_affects_p1 = []
 facing_left_p1 = False
 animation_frame_count_p1 = 0
 attackbox_p1_exists = False
+attackbox_p1 = gamebox.from_color(-100, -100, 'red', 1, 1)
+on_hit_p1 = False
 
 playertwoimage = 'Goku-1.png'
 playertwo = gamebox.from_image(700, 0, playertwoimage)
@@ -28,12 +30,16 @@ status_affects_p2 = []
 facing_left_p2 = True
 animation_frame_count_p2 = 0
 attackbox_p2_exists = False
+attackbox_p2 = gamebox.from_color(1100, -100, 'red', 1, 1)
+on_hit_p2 = False
 
 
 def tick(keys):
     global ticks
     global playeroneimage, playerone, status_affects_p1, facing_left_p1, animation_frame_count_p1, attackbox_p1_exists
+    global attackbox_p1, on_hit_p1
     global playertwoimage, playertwo, status_affects_p2, facing_left_p2, animation_frame_count_p2, attackbox_p2_exists
+    global attackbox_p2, on_hit_p2
     music.play(1)
     ticks +=1
     scoredisplay = gamebox.from_text(0, 0, "SCORE: " + str(ticks // 30), "Arial", 14, "red", italic=True)
@@ -101,8 +107,9 @@ def tick(keys):
     if pygame.K_PERIOD in keys and animation_frame_count_p1 == 0:
         if pygame.K_RIGHT in keys or pygame.K_LEFT in keys:
             playeroneimage = 'Goku-kick.png'
-            animation_frame_count_p1 = 30
+            animation_frame_count_p1 = 20
             attackbox_p1_exists = True
+            on_hit_p2 = False
         if pygame.K_UP in keys:
             playeroneimage = 'Goku-Uppunch.png'
             animation_frame_count_p1 = 25
@@ -115,8 +122,9 @@ def tick(keys):
     if pygame.K_LSHIFT in keys and animation_frame_count_p2 == 0:
         if pygame.K_d in keys or pygame.K_a in keys:
             playertwoimage = 'Goku-kick.png'
-            animation_frame_count_p2 = 30
+            animation_frame_count_p2 = 20
             attackbox_p2_exists = True
+            on_hit_p1 = False
         if pygame.K_w in keys:
             playertwoimage = 'Goku-Uppunch.png'
             animation_frame_count_p2 = 25
@@ -127,7 +135,7 @@ def tick(keys):
 
 
     # DEBUG STUFF
-    if status_affects_p1 != []:
+    if status_affects_p1:
         debug = gamebox.from_text(30,30, status_affects_p1[0], "Arial", 12, 'red', italic=True)
     else:
         debug = gamebox.from_text(30, 30, 'grounded', "Arial", 12, 'red', italic=True)
@@ -135,6 +143,7 @@ def tick(keys):
     # IMAGE CREATE PLAYER ONE
     # HITBOX CREATE PLAYER ONE
     yspeed_p1 = playerone.yspeed
+    xspeed_p1 = playerone.xspeed
     playerone = gamebox.from_image(playerone.x, playerone.y, playeroneimage)
     playerone.scale_by(1.75)
     playerone_hitbox = gamebox.from_color(playerone.x-5*(facing_left_p1 == False)+5*(facing_left_p1 == True), playerone.y+10, "green", 35, 60)
@@ -142,21 +151,25 @@ def tick(keys):
         attackbox_p1 = gamebox.from_color(playerone.x + 20 * (facing_left_p1 == False) - 20 * (facing_left_p1 == True), playerone.y + 5,
                        "red", 40, 20)
     playerone.yspeed = yspeed_p1
+    playerone.xspeed = xspeed_p1
     playerone_hitbox.yspeed = yspeed_p1
-    if facing_left_p1 == True:
+    if facing_left_p1:
         playerone.flip()
 
     playerone.yspeed += .5
     playerone.y = playerone.y + playerone.yspeed
+    playerone.x = playerone.x + playerone.xspeed
     if playerone.bottom_touches(background):
         playerone.move_to_stop_overlapping(background)
 
-    if playerone.y >= background.y -70 and 'airborne' in status_affects_p1:
+    if playerone.y >= background.y - 70 and 'airborne' in status_affects_p1:
         status_affects_p1.remove('airborne')
+    playerone.xspeed = playerone.xspeed*.9
 
     # IMAGE CREATE PLAYER TWO
     # HITBOX CREATE PLAYER TWO
     yspeed_p2 = playertwo.yspeed
+    xspeed_p2 = playertwo.xspeed
     playertwo = gamebox.from_image(playertwo.x, playertwo.y, playertwoimage)
     playertwo.scale_by(1.75)
     playertwo_hitbox = gamebox.from_color(playertwo.x-5*(facing_left_p2 == False)+5*(facing_left_p2 == True),playertwo.y+10, "green", 35, 60)
@@ -164,28 +177,48 @@ def tick(keys):
         attackbox_p2 = gamebox.from_color(playertwo.x + 20 * (facing_left_p2 == False) - 20 * (facing_left_p2 == True), playertwo.y + 5,
                        "red", 40, 20)
     playertwo.yspeed = yspeed_p2
+    playertwo.xspeed = xspeed_p2
     playertwo_hitbox.yspeed = yspeed_p2
     if facing_left_p2:
         playertwo.flip()
 
     playertwo.yspeed += .5
     playertwo.y = playertwo.y + playertwo.yspeed
+    playertwo.x = playertwo.x + playertwo.xspeed
     if playertwo.bottom_touches(background):
         playertwo.move_to_stop_overlapping(background)
 
     if playertwo.y >= background.y - 70 and 'airborne' in status_affects_p2:
         status_affects_p2.remove('airborne')
+    playertwo.xspeed = playertwo.xspeed*.9
+
+    # HITBOX DETECTION
+    hit_detected_p1 = gamebox.from_text(100, 100, ' ', "Arial", 18, 'red', italic=True)
+    hit_detected_p2 = gamebox.from_text(100, 100, ' ', "Arial", 18, 'red', italic=True)
+    if attackbox_p2.touches(playerone_hitbox) and on_hit_p1 == False:
+        hit_detected_p1 = gamebox.from_text(100, 100, 'PLAYER ONE HIT', "Arial", 18, 'red', italic=True)
+        on_hit_p1 = True
+        playerone.yspeed = -10
+        playerone.xspeed = 10 - (20 * (facing_left_p2==True))
+    if attackbox_p1.touches(playertwo_hitbox) and on_hit_p2 == False:
+        hit_detected_p2 = gamebox.from_text(100, 90, 'PLAYER TWO HIT', "Arial", 18, 'red', italic=True)
+        on_hit_p2 = True
+        playertwo.yspeed = -10
+        playertwo.xspeed = 10 - (20 * (facing_left_p1==True))
+
 
     # REDUCES ANIMATION DURATION
     animation_frame_count_p1 -= 1
     if animation_frame_count_p1 <= 0:
         animation_frame_count_p1 = 0
         attackbox_p1_exists = False
+        attackbox_p1 = gamebox.from_color(-100, -100, 'red', 1, 1)
 
     animation_frame_count_p2 -= 1
     if animation_frame_count_p2 <= 0:
         animation_frame_count_p2 = 0
         attackbox_p2_exists = False
+        attackbox_p2 = gamebox.from_color(1100, -100, 'red', 1, 1)
 
     camera.draw(backgroundscreen)
     camera.draw(scoredisplay)
@@ -197,6 +230,8 @@ def tick(keys):
             camera.draw(attackbox_p2)
         if attackbox_p1_exists and playeroneimage == 'Goku-kick.png':
             camera.draw(attackbox_p1)
+        camera.draw(hit_detected_p1)
+        camera.draw(hit_detected_p2)
     camera.draw(playerone)
     camera.draw(playertwo)
     camera.display()
