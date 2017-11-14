@@ -4,6 +4,7 @@
 import gamebox
 import pygame
 import math
+import random
 CAMERA_WIDTH, CAMERA_HEIGHT = 1000, 600
 camera = gamebox.Camera(CAMERA_WIDTH, CAMERA_HEIGHT)
 playeroneimage = 'Goku-1.png'
@@ -29,6 +30,10 @@ def tick(keys):
     if pygame.K_UP in keys and playerone.touches(background):
         playerone.yspeed = -10
         status_affects.append('airborne')
+        keys.remove(pygame.K_UP)
+
+    if 'airborne' in status_affects:
+        playeroneimage = 'Goku-jump.png'
 
     if pygame.K_DOWN in keys and playerone.bottom_touches(background):
         playeroneimage = 'Goku-crouch.png'
@@ -37,17 +42,25 @@ def tick(keys):
         playeroneimage = 'Goku-1.png'
 
     if pygame.K_RIGHT in keys:
-        if pygame.K_DOWN not in keys:
-            playerone.x += 4
         facing_left = False
+        playerone.x += 4
+        if (pygame.K_DOWN in keys or pygame.K_PERIOD in keys) and 'airborne' not in status_affects:
+            playerone.x += -4
+        if pygame.K_PERIOD in keys:
+            playeroneimage = 'Goku-kick.png'
 
     if pygame.K_LEFT in keys:
-        if pygame.K_DOWN not in keys:
-            playerone.x += -4
         facing_left = True
+        playerone.x += -4
+        if (pygame.K_DOWN in keys or pygame.K_PERIOD in keys) and 'airborne' not in status_affects:
+            playerone.x += 4
+        if pygame.K_PERIOD in keys:
+            playeroneimage = 'Goku-kick.png'
 
-    if 'airborne' in status_affects:
-        playeroneimage = 'Goku-jump.png'
+    if status_affects != []:
+        debug = gamebox.from_text(30,30, status_affects[0], "Arial", 12, 'red', italic=True)
+    else:
+        debug = gamebox.from_text(30, 30, 'grounded', "Arial", 12, 'red', italic=True)
 
     yspeed = playerone.yspeed
     playerone = gamebox.from_image(playerone.x, playerone.y, playeroneimage)
@@ -56,18 +69,18 @@ def tick(keys):
     if facing_left == True:
         playerone.flip()
 
-
-
     playerone.yspeed += .5
     playerone.y = playerone.y + playerone.yspeed
     if playerone.bottom_touches(background):
         playerone.move_to_stop_overlapping(background)
 
-    if playerone.y < background.y -30 and 'airborne' in status_affects:
+    if playerone.y >= background.y -70 and 'airborne' in status_affects:
         status_affects.remove('airborne')
 
     camera.draw(backgroundscreen)
     camera.draw(scoredisplay)
+    if debug:
+        camera.draw(debug)
     camera.draw(playerone)
     camera.display()
 
