@@ -17,10 +17,10 @@ backgroundscreen = gamebox.from_image(550,400, "sea-water-ocean-storm.jpg")
 backgroundscreen.scale_by(1)
 status_affects = []
 facing_left = False
-do_flip_image = False
+animation_frame_count = 0
 
 def tick(keys):
-    global playeroneimage, playerone, yspeed, ticks, status_affects, facing_left, do_flip_image
+    global playeroneimage, playerone, yspeed, ticks, status_affects, facing_left, animation_frame_count
     music.play(1)
     ticks +=1
     scoredisplay = gamebox.from_text(0, 0, "SCORE: " + str(ticks // 30), "Arial", 14, "red", italic=True)
@@ -32,30 +32,34 @@ def tick(keys):
         status_affects.append('airborne')
         keys.remove(pygame.K_UP)
 
-    if 'airborne' in status_affects:
+    if 'airborne' in status_affects and animation_frame_count == 0:
         playeroneimage = 'Goku-jump.png'
 
-    if pygame.K_DOWN in keys and playerone.bottom_touches(background):
+    if pygame.K_DOWN in keys and playerone.bottom_touches(background) and animation_frame_count == 0:
         playeroneimage = 'Goku-crouch.png'
         playerone.y = background.y - 30
-    elif pygame.K_DOWN not in keys and playerone.bottom_touches(background) and status_affects == []:
+    elif pygame.K_DOWN not in keys and playerone.bottom_touches(background) and status_affects == [] and animation_frame_count == 0:
         playeroneimage = 'Goku-1.png'
 
     if pygame.K_RIGHT in keys:
         facing_left = False
-        playerone.x += 4
-        if (pygame.K_DOWN in keys or pygame.K_PERIOD in keys) and 'airborne' not in status_affects:
+        if playeroneimage != 'Goku-kick.png' or 'airborne' in status_affects:
+            playerone.x += 4
+        if (pygame.K_DOWN in keys or pygame.K_PERIOD in keys) and 'airborne' not in status_affects and animation_frame_count == 0:
             playerone.x += -4
-        if pygame.K_PERIOD in keys:
+        if pygame.K_PERIOD in keys and animation_frame_count == 0:
             playeroneimage = 'Goku-kick.png'
+            animation_frame_count = 30
 
     if pygame.K_LEFT in keys:
         facing_left = True
-        playerone.x += -4
-        if (pygame.K_DOWN in keys or pygame.K_PERIOD in keys) and 'airborne' not in status_affects:
+        if playeroneimage != 'Goku-kick.png' or 'airborne' in status_affects:
+            playerone.x += -4
+        if (pygame.K_DOWN in keys or pygame.K_PERIOD in keys) and 'airborne' not in status_affects and animation_frame_count == 0:
             playerone.x += 4
-        if pygame.K_PERIOD in keys:
+        if pygame.K_PERIOD in keys and animation_frame_count == 0:
             playeroneimage = 'Goku-kick.png'
+            animation_frame_count = 30
 
     if status_affects != []:
         debug = gamebox.from_text(30,30, status_affects[0], "Arial", 12, 'red', italic=True)
@@ -76,6 +80,10 @@ def tick(keys):
 
     if playerone.y >= background.y -70 and 'airborne' in status_affects:
         status_affects.remove('airborne')
+
+    animation_frame_count -= 1
+    if animation_frame_count <= 0:
+        animation_frame_count = 0
 
     camera.draw(backgroundscreen)
     camera.draw(scoredisplay)
