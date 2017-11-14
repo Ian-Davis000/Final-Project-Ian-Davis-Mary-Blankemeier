@@ -1,5 +1,6 @@
-# Ian Davis jid7da 2d top down portal
-
+# Ian Davis jid7da Fighting Game
+# Mary Blankemeier mhb5zf
+# Sprites by AngryBoy on DBZVortex
 
 import gamebox
 import pygame
@@ -22,6 +23,7 @@ animation_frame_count_p1 = 0
 attackbox_p1_exists = False
 attackbox_p1 = gamebox.from_color(-100, -100, 'red', 1, 1)
 on_hit_p1 = False
+attack_cooldown_p1 = 0
 
 playertwoimage = 'Goku-1.png'
 playertwo = gamebox.from_image(700, 0, playertwoimage)
@@ -32,14 +34,15 @@ animation_frame_count_p2 = 0
 attackbox_p2_exists = False
 attackbox_p2 = gamebox.from_color(1100, -100, 'red', 1, 1)
 on_hit_p2 = False
+attack_cooldown_p2 = 0
 
 
 def tick(keys):
     global ticks
     global playeroneimage, playerone, status_affects_p1, facing_left_p1, animation_frame_count_p1, attackbox_p1_exists
-    global attackbox_p1, on_hit_p1
+    global attackbox_p1, on_hit_p1, attack_cooldown_p1
     global playertwoimage, playertwo, status_affects_p2, facing_left_p2, animation_frame_count_p2, attackbox_p2_exists
-    global attackbox_p2, on_hit_p2
+    global attackbox_p2, on_hit_p2, attack_cooldown_p2
     music.play(1)
     ticks +=1
     scoredisplay = gamebox.from_text(0, 0, "SCORE: " + str(ticks // 30), "Arial", 14, "red", italic=True)
@@ -104,7 +107,7 @@ def tick(keys):
             playertwo.x += 4
 
     #ATTACKS PLAYER ONE
-    if pygame.K_PERIOD in keys and animation_frame_count_p1 == 0:
+    if pygame.K_PERIOD in keys and animation_frame_count_p1 == 0 and attack_cooldown_p1 == 0:
         if pygame.K_RIGHT in keys or pygame.K_LEFT in keys:
             playeroneimage = 'Goku-kick.png'
             animation_frame_count_p1 = 20
@@ -114,12 +117,15 @@ def tick(keys):
             playeroneimage = 'Goku-Uppunch.png'
             animation_frame_count_p1 = 25
             playerone.yspeed -= -3
+            attackbox_p1_exists = True
+            on_hit_p2 = False
+    if pygame.K_PERIOD in keys and animation_frame_count_p1 == 0:
         if pygame.K_DOWN in keys:
             playeroneimage = 'Goku-shield.png'
             animation_frame_count_p1 = 10
 
     #ATTACKS PLAYER TWO
-    if pygame.K_LSHIFT in keys and animation_frame_count_p2 == 0:
+    if pygame.K_LSHIFT in keys and animation_frame_count_p2 == 0 and attack_cooldown_p2 == 0:
         if pygame.K_d in keys or pygame.K_a in keys:
             playertwoimage = 'Goku-kick.png'
             animation_frame_count_p2 = 20
@@ -129,6 +135,9 @@ def tick(keys):
             playertwoimage = 'Goku-Uppunch.png'
             animation_frame_count_p2 = 25
             playertwo.yspeed -= -3
+            attackbox_p2_exists = True
+            on_hit_p1 = False
+    if pygame.K_LSHIFT in keys and animation_frame_count_p2 == 0:
         if pygame.K_s in keys:
             playertwoimage = 'Goku-shield.png'
             animation_frame_count_p2 = 10
@@ -146,10 +155,13 @@ def tick(keys):
     xspeed_p1 = playerone.xspeed
     playerone = gamebox.from_image(playerone.x, playerone.y, playeroneimage)
     playerone.scale_by(1.75)
-    playerone_hitbox = gamebox.from_color(playerone.x-5*(facing_left_p1 == False)+5*(facing_left_p1 == True), playerone.y+10, "green", 35, 60)
-    if attackbox_p1_exists and playeroneimage == 'Goku-kick.png':
-        attackbox_p1 = gamebox.from_color(playerone.x + 20 * (facing_left_p1 == False) - 20 * (facing_left_p1 == True), playerone.y + 5,
+    playerone_hitbox = gamebox.from_color(playerone.x-5+10*(facing_left_p1 == True), playerone.y+10, "green", 35, 60)
+    if attackbox_p1_exists:
+        if playeroneimage == 'Goku-kick.png':
+            attackbox_p1 = gamebox.from_color(playerone.x + 20 - 40 * (facing_left_p1 == True), playerone.y + 5,
                        "red", 40, 20)
+        if playeroneimage == 'Goku-Uppunch.png':
+            attackbox_p1 = gamebox.from_color(playerone.x + 10-20*(facing_left_p1==True), playerone.y - 25, "red", 30, 20)
     playerone.yspeed = yspeed_p1
     playerone.xspeed = xspeed_p1
     playerone_hitbox.yspeed = yspeed_p1
@@ -172,10 +184,12 @@ def tick(keys):
     xspeed_p2 = playertwo.xspeed
     playertwo = gamebox.from_image(playertwo.x, playertwo.y, playertwoimage)
     playertwo.scale_by(1.75)
-    playertwo_hitbox = gamebox.from_color(playertwo.x-5*(facing_left_p2 == False)+5*(facing_left_p2 == True),playertwo.y+10, "green", 35, 60)
-    if attackbox_p2_exists and playertwoimage == 'Goku-kick.png':
-        attackbox_p2 = gamebox.from_color(playertwo.x + 20 * (facing_left_p2 == False) - 20 * (facing_left_p2 == True), playertwo.y + 5,
-                       "red", 40, 20)
+    playertwo_hitbox = gamebox.from_color(playertwo.x-5+10*(facing_left_p2 == True),playertwo.y+10, "green", 35, 60)
+    if attackbox_p2_exists:
+        if playertwoimage == 'Goku-kick.png':
+            attackbox_p2 = gamebox.from_color(playertwo.x + 20 - 40 * (facing_left_p2 == True), playertwo.y + 5, "red", 40, 20)
+        if playertwoimage == 'Goku-Uppunch.png':
+            attackbox_p2 = gamebox.from_color(playertwo.x + 10-20*(facing_left_p2==True), playertwo.y - 25, "red", 30, 20)
     playertwo.yspeed = yspeed_p2
     playertwo.xspeed = xspeed_p2
     playertwo_hitbox.yspeed = yspeed_p2
@@ -208,17 +222,28 @@ def tick(keys):
 
 
     # REDUCES ANIMATION DURATION
-    animation_frame_count_p1 -= 1
+    # ATTACK COOLDOWNS
     if animation_frame_count_p1 <= 0:
         animation_frame_count_p1 = 0
         attackbox_p1_exists = False
         attackbox_p1 = gamebox.from_color(-100, -100, 'red', 1, 1)
+        if attack_cooldown_p1 > 0:
+            attack_cooldown_p1 -= 1
+    else:
+        animation_frame_count_p1 -= 1
+        if animation_frame_count_p1 == 0:
+            attack_cooldown_p1 = 40
 
-    animation_frame_count_p2 -= 1
     if animation_frame_count_p2 <= 0:
         animation_frame_count_p2 = 0
         attackbox_p2_exists = False
         attackbox_p2 = gamebox.from_color(1100, -100, 'red', 1, 1)
+        if attack_cooldown_p2 > 0:
+            attack_cooldown_p2 -= 1
+    else:
+        animation_frame_count_p2 -= 1
+        if animation_frame_count_p2 == 0:
+            attack_cooldown_p2 = 40
 
     camera.draw(backgroundscreen)
     camera.draw(scoredisplay)
@@ -226,9 +251,9 @@ def tick(keys):
         camera.draw(debug)
         camera.draw(playerone_hitbox)
         camera.draw(playertwo_hitbox)
-        if attackbox_p2_exists and playertwoimage == 'Goku-kick.png':
+        if attackbox_p2_exists and (playertwoimage == 'Goku-kick.png' or playertwoimage == 'Goku-Uppunch.png'):
             camera.draw(attackbox_p2)
-        if attackbox_p1_exists and playeroneimage == 'Goku-kick.png':
+        if attackbox_p1_exists and (playeroneimage == 'Goku-kick.png' or playeroneimage == 'Goku-Uppunch.png'):
             camera.draw(attackbox_p1)
         camera.draw(hit_detected_p1)
         camera.draw(hit_detected_p2)
