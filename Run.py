@@ -15,9 +15,11 @@ music = gamebox.load_sound("https://upload.wikimedia.org/wikipedia/commons/3/3c/
 backgroundscreen = gamebox.from_image(550,400, "sea-water-ocean-storm.jpg")
 backgroundscreen.scale_by(1)
 status_affects = []
+facing_left = False
+do_flip_image = False
 
 def tick(keys):
-    global playeroneimage, playerone, yspeed, ticks, status_affects
+    global playeroneimage, playerone, yspeed, ticks, status_affects, facing_left, do_flip_image
     music.play(1)
     ticks +=1
     scoredisplay = gamebox.from_text(0, 0, "SCORE: " + str(ticks // 30), "Arial", 14, "red", italic=True)
@@ -34,11 +36,15 @@ def tick(keys):
     elif pygame.K_DOWN not in keys and playerone.bottom_touches(background) and status_affects == []:
         playeroneimage = 'Goku-1.png'
 
-    if pygame.K_RIGHT in keys and pygame.K_DOWN not in keys:
-        playerone.x += 4
+    if pygame.K_RIGHT in keys:
+        if pygame.K_DOWN not in keys:
+            playerone.x += 4
+        facing_left = False
 
-    if pygame.K_LEFT in keys and pygame.K_DOWN not in keys:
-        playerone.x += -4
+    if pygame.K_LEFT in keys:
+        if pygame.K_DOWN not in keys:
+            playerone.x += -4
+        facing_left = True
 
     if 'airborne' in status_affects:
         playeroneimage = 'Goku-jump.png'
@@ -47,6 +53,10 @@ def tick(keys):
     playerone = gamebox.from_image(playerone.x, playerone.y, playeroneimage)
     playerone.scale_by(1.75)
     playerone.yspeed = yspeed
+    if facing_left == True:
+        playerone.flip()
+
+
 
     playerone.yspeed += .5
     playerone.y = playerone.y + playerone.yspeed
