@@ -232,7 +232,7 @@ def tick(keys):
     else:
         animation_frame_count_p1 -= 1
         if animation_frame_count_p1 == 0:
-            attack_cooldown_p1 = 40
+            attack_cooldown_p1 = 10
 
     if animation_frame_count_p2 <= 0:
         animation_frame_count_p2 = 0
@@ -243,7 +243,7 @@ def tick(keys):
     else:
         animation_frame_count_p2 -= 1
         if animation_frame_count_p2 == 0:
-            attack_cooldown_p2 = 40
+            attack_cooldown_p2 = 10
 
     camera.draw(backgroundscreen)
     camera.draw(scoredisplay)
