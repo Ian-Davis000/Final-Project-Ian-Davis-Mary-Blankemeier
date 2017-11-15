@@ -212,14 +212,37 @@ def tick(keys):
     if attackbox_p2.touches(playerone_hitbox) and on_hit_p1 == False:
         hit_detected_p1 = gamebox.from_text(100, 100, 'PLAYER ONE HIT', "Arial", 18, 'red', italic=True)
         on_hit_p1 = True
-        playerone.yspeed = -10
-        playerone.xspeed = 10 - (20 * (facing_left_p2==True))
+        if playertwoimage == 'Goku-kick.png':
+            playertwo.xspeed = -2
+            playerone.xspeed = 10 - (20 * (facing_left_p2==True))
+            playeroneimage = 'Goku-knockback.png'
+            animation_frame_count_p1 = 20
+        elif playertwoimage == 'Goku-Uppunch.png':
+            playeroneimage = 'Goku-knockup.png'
+            animation_frame_count_p1 = 20
+            playerone.yspeed = -10
+            playerone.xspeed = 2 - (4 * (facing_left_p2==True))
+        if facing_left_p2:
+            facing_left_p1 = False
+        else:
+            facing_left_p1 = True
     if attackbox_p1.touches(playertwo_hitbox) and on_hit_p2 == False:
         hit_detected_p2 = gamebox.from_text(100, 90, 'PLAYER TWO HIT', "Arial", 18, 'red', italic=True)
         on_hit_p2 = True
-        playertwo.yspeed = -10
-        playertwo.xspeed = 10 - (20 * (facing_left_p1==True))
-
+        if playeroneimage == 'Goku-kick.png':
+            playertwo.yspeed = -2
+            playertwo.xspeed = 10 - (20 * (facing_left_p1==True))
+            playertwoimage = 'Goku-knockback.png'
+            animation_frame_count_p2 = 20
+        elif playeroneimage == 'Goku-Uppunch.png':
+            playertwoimage = 'Goku-knockup.png'
+            animation_frame_count_p2 = 20
+            playertwo.yspeed = -10
+            playertwo.xspeed = 2 - (4 * (facing_left_p1 == True))
+        if facing_left_p1:
+            facing_left_p2 = False
+        else:
+            facing_left_p2 = True
 
     # REDUCES ANIMATION DURATION
     # ATTACK COOLDOWNS
