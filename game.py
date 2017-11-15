@@ -24,6 +24,7 @@ attackbox_p1_exists = False
 attackbox_p1 = gamebox.from_color(-100, -100, 'red', 1, 1)
 on_hit_p1 = False
 attack_cooldown_p1 = 0
+doublejump_p1 = False
 
 playertwoimage = 'Goku-1.png'
 playertwo = gamebox.from_image(700, 0, playertwoimage)
@@ -35,14 +36,15 @@ attackbox_p2_exists = False
 attackbox_p2 = gamebox.from_color(1100, -100, 'red', 1, 1)
 on_hit_p2 = False
 attack_cooldown_p2 = 0
+doublejump_p2 = False
 
 
 def tick(keys):
     global ticks
     global playeroneimage, playerone, status_affects_p1, facing_left_p1, animation_frame_count_p1, attackbox_p1_exists
-    global attackbox_p1, on_hit_p1, attack_cooldown_p1
+    global attackbox_p1, on_hit_p1, attack_cooldown_p1, doublejump_p1
     global playertwoimage, playertwo, status_affects_p2, facing_left_p2, animation_frame_count_p2, attackbox_p2_exists
-    global attackbox_p2, on_hit_p2, attack_cooldown_p2
+    global attackbox_p2, on_hit_p2, attack_cooldown_p2, doublejump_p2
     music.play(1)
     ticks +=1
     scoredisplay = gamebox.from_text(0, 0, "SCORE: " + str(ticks // 30), "Arial", 14, "red", italic=True)
@@ -54,6 +56,13 @@ def tick(keys):
     if pygame.K_UP in keys and playerone.touches(background):
         playerone.yspeed = -10
         status_affects_p1.append('airborne')
+
+    if not playerone.touches(background) and doublejump_p1 == False and pygame.K_UP in keys:
+        doublejump_p1 = True
+        playerone.yspeed = -10
+
+    if playerone.touches(background):
+        doublejump_p1 = False
 
     if 'airborne' in status_affects_p1 and animation_frame_count_p1 == 0:
         playeroneimage = 'Goku-jump.png'
@@ -82,6 +91,13 @@ def tick(keys):
     if pygame.K_w in keys and playertwo.touches(background):
         playertwo.yspeed = -10
         status_affects_p2.append('airborne')
+
+    if not playertwo.touches(background) and doublejump_p2 == False and pygame.K_w in keys:
+        doublejump_p2 = True
+        playertwo.yspeed = -10
+
+    if playertwo.touches(background):
+        doublejump_p2 = False
 
     if 'airborne' in status_affects_p2 and animation_frame_count_p2 == 0:
         playertwoimage = 'Goku-jump.png'
@@ -142,6 +158,12 @@ def tick(keys):
             playertwoimage = 'Goku-shield.png'
             animation_frame_count_p2 = 10
 
+
+    # REMOVES JUMP KEY TO ALLOW DOUBLE JUMP - MUST GO AFTER ATTACKS
+    if pygame.K_UP in keys:
+        keys.remove(pygame.K_UP)
+    if pygame.K_w in keys:
+        keys.remove(pygame.K_w)
 
     # DEBUG STUFF
     if status_affects_p1:
