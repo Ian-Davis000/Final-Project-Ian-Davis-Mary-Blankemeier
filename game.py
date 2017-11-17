@@ -27,8 +27,7 @@ attack_cooldown_p1 = 0
 doublejump_p1 = False
 kamehameha_list_p1 = []
 
-playertwoimage = 'Goku-1.png'
-playertwo = gamebox.from_image(700, 0, playertwoimage)
+playertwo = gamebox.from_image(700, 0, goku_sprsheet[0])
 playerone.scale_by(1.75)
 status_affects_p2 = []
 facing_left_p2 = True
@@ -53,75 +52,63 @@ def tick(keys):
     scoredisplay.right = camera.right
 
 
-    # MOVEMENT PLAYER ONE
+    ##### MOVEMENT PLAYER ONE #####
+    # UP
     if pygame.K_UP in keys and playerone.touches(background):
         playerone.yspeed = -10
         status_affects_p1.append('airborne')
-
     if not playerone.touches(background) and doublejump_p1 == False and pygame.K_UP in keys:
         doublejump_p1 = True
         playerone.yspeed = -10
-
     if playerone.touches(background):
         doublejump_p1 = False
-
     if 'airborne' in status_affects_p1 and animation_frame_count_p1 == 0:
         playeroneimage = goku_sprsheet[2]
-
+    # DOWN
     if pygame.K_DOWN in keys and playerone.bottom_touches(background) and animation_frame_count_p1 == 0:
         playeroneimage = goku_sprsheet[1]
         playerone.y = background.y - 30
     elif 'airborne' not in status_affects_p1 and animation_frame_count_p1 == 0:
         playeroneimage = goku_sprsheet[0]
-
+    # RIGHT
     if pygame.K_RIGHT in keys:
         facing_left_p1 = False
-        if (playeroneimage != goku_sprsheet[5] and playeroneimage != goku_sprsheet[3]) or 'airborne' in status_affects_p1:
+        if playeroneimage == goku_sprsheet[0] or playeroneimage == goku_sprsheet[2] or 'airborne' in status_affects_p1:
             playerone.x += 4
-        if (pygame.K_DOWN in keys or pygame.K_PERIOD in keys) and 'airborne' not in status_affects_p1 and animation_frame_count_p1 == 0:
-            playerone.x += -4
-
+    # LEFT
     if pygame.K_LEFT in keys:
         facing_left_p1 = True
-        if (playeroneimage != goku_sprsheet[5] and playeroneimage != goku_sprsheet[3]) or 'airborne' in status_affects_p1:
+        if playeroneimage == goku_sprsheet[0] or playeroneimage == goku_sprsheet[2] or 'airborne' in status_affects_p1:
             playerone.x += -4
-        if (pygame.K_DOWN in keys or pygame.K_PERIOD in keys) and 'airborne' not in status_affects_p1 and animation_frame_count_p1 == 0:
-            playerone.x += 4
 
-    # MOVEMENT PLAYER TWO
+    ###### MOVEMENT PLAYER TWO ######
+    # UP
     if pygame.K_w in keys and playertwo.touches(background):
         playertwo.yspeed = -10
         status_affects_p2.append('airborne')
-
     if not playertwo.touches(background) and doublejump_p2 == False and pygame.K_w in keys:
         doublejump_p2 = True
         playertwo.yspeed = -10
-
     if playertwo.touches(background):
         doublejump_p2 = False
-
     if 'airborne' in status_affects_p2 and animation_frame_count_p2 == 0:
         playertwoimage = goku_sprsheet[2]
-
+    # DOWN
     if pygame.K_s in keys and playertwo.bottom_touches(background) and animation_frame_count_p2 == 0:
         playertwoimage = goku_sprsheet[1]
         playertwo.y = background.y - 30
     elif 'airborne' not in status_affects_p2 and animation_frame_count_p2 == 0:
         playertwoimage = goku_sprsheet[0]
-
     if pygame.K_d in keys:
+    # RIGHT
         facing_left_p2 = False
-        if (playertwoimage != goku_sprsheet[5] and playertwoimage != goku_sprsheet[3]) or 'airborne' in status_affects_p2:
-            playertwo.x += 4
-        if (pygame.K_s in keys or pygame.K_LSHIFT in keys) and 'airborne' not in status_affects_p2 and animation_frame_count_p2 == 0:
-            playertwo.x += -4
-
+        if playeroneimage == goku_sprsheet[0] or playeroneimage == goku_sprsheet[2] or 'airborne' in status_affects_p1:
+            playerone.x += 4
     if pygame.K_a in keys:
+    # LEFT
         facing_left_p2 = True
-        if (playertwoimage != goku_sprsheet[5] and playertwoimage != goku_sprsheet[3]) or 'airborne' in status_affects_p2:
-            playertwo.x += -4
-        if (pygame.K_s in keys or pygame.K_LSHIFT in keys) and 'airborne' not in status_affects_p2 and animation_frame_count_p2 == 0:
-            playertwo.x += 4
+        if playeroneimage == goku_sprsheet[0] or playeroneimage == goku_sprsheet[2] or 'airborne' in status_affects_p1:
+            playerone.x += -4
 
     #ATTACKS PLAYER ONE
     if pygame.K_PERIOD in keys and animation_frame_count_p1 == 0 and attack_cooldown_p1 == 0:
@@ -175,7 +162,6 @@ def tick(keys):
     # PROJECTILES P1
     kmhmh = 0
     while kmhmh < len(kamehameha_list_p1):
-    #for kmhmh in range(0,len(kamehameha_list_p1)):
         if kamehameha_list_p1[kmhmh][1]:
             if animation_frame_count_p1 >= 20:
                 playeroneimage = goku_sprsheet[math.floor(25-animation_frame_count_p1*12/40)]
