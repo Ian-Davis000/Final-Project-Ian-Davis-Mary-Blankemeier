@@ -102,13 +102,13 @@ def tick(keys):
     if pygame.K_d in keys:
     # RIGHT
         facing_left_p2 = False
-        if playeroneimage == goku_sprsheet[0] or playeroneimage == goku_sprsheet[2] or 'airborne' in status_affects_p1:
-            playerone.x += 4
+        if playertwoimage == goku_sprsheet[0] or playertwoimage == goku_sprsheet[2] or 'airborne' in status_affects_p2:
+            playertwo.x += 4
     if pygame.K_a in keys:
     # LEFT
         facing_left_p2 = True
-        if playeroneimage == goku_sprsheet[0] or playeroneimage == goku_sprsheet[2] or 'airborne' in status_affects_p1:
-            playerone.x += -4
+        if playertwoimage == goku_sprsheet[0] or playertwoimage == goku_sprsheet[2] or 'airborne' in status_affects_p2:
+            playertwo.x += -4
 
     #ATTACKS PLAYER ONE
     if pygame.K_PERIOD in keys and animation_frame_count_p1 == 0 and attack_cooldown_p1 == 0:
