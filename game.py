@@ -37,14 +37,15 @@ attackbox_p2 = gamebox.from_color(1100, -100, 'red', 1, 1)
 on_hit_p2 = False
 attack_cooldown_p2 = 0
 doublejump_p2 = False
+kamehameha_list_p2 = []
 
 
 def tick(keys):
     global ticks, goku_sprsheet
     global playeroneimage, playerone, status_affects_p1, facing_left_p1, animation_frame_count_p1, attackbox_p1_exists
-    global attackbox_p1, on_hit_p1, attack_cooldown_p1, doublejump_p1, kamehameha_list_p1, attackboxes_p1
+    global attackbox_p1, on_hit_p1, attack_cooldown_p1, doublejump_p1, kamehameha_list_p1
     global playertwoimage, playertwo, status_affects_p2, facing_left_p2, animation_frame_count_p2, attackbox_p2_exists
-    global attackbox_p2, on_hit_p2, attack_cooldown_p2, doublejump_p2
+    global attackbox_p2, on_hit_p2, attack_cooldown_p2, doublejump_p2, kamehameha_list_p2
     music.play(-1)
     ticks += 1
     scoredisplay = gamebox.from_text(0, 0, "SCORE: " + str(ticks // 30), "Arial", 14, "red", italic=True)
@@ -149,6 +150,11 @@ def tick(keys):
         if pygame.K_s in keys:
             playertwoimage = goku_sprsheet[3]
             animation_frame_count_p2 = 10
+    # EMPOWERED ATTACKS PLAYER TWO
+    if pygame.K_LCTRL in keys and animation_frame_count_p2 == 0 and attack_cooldown_p2 == 0:
+        if pygame.K_a in keys or pygame.K_d in keys:
+            animation_frame_count_p2 = 60
+            kamehameha_list_p2.append([gamebox.from_color(-30, -100, 'red', 1, 1), True, False])
 
     # REMOVES JUMP KEY TO ALLOW DOUBLE JUMP - MUST GO AFTER ATTACKS
     if pygame.K_UP in keys:
@@ -181,6 +187,30 @@ def tick(keys):
             kamehameha_list_p1.remove(kamehameha_list_p1[kmhmh])
         kmhmh += 1
 
+    # PROJECTILES P2
+    kmhmh = 0
+    while kmhmh < len(kamehameha_list_p2):
+        if kamehameha_list_p2[kmhmh][1]:
+            if animation_frame_count_p2 >= 20:
+                playertwoimage = goku_sprsheet[math.floor(25-animation_frame_count_p2*12/40)]
+            if animation_frame_count_p2 <= 20:
+                playertwoimage = goku_sprsheet[19]
+                attackbox_p2_exists = True
+            if animation_frame_count_p2 == 20:
+                kamehameha_list_p2[kmhmh][0].x = playertwo.x+40-80*facing_left_p2
+                kamehameha_list_p2[kmhmh][0].y = playertwo.y+10
+                kamehameha_list_p2[kmhmh][2] = facing_left_p2
+            if animation_frame_count_p2 < 20:
+                kamehameha_list_p2[kmhmh][0] = gamebox.from_image(kamehameha_list_p2[kmhmh][0].x, kamehameha_list_p2[kmhmh][0].y, 'kamehameha-charge.png')
+                kamehameha_list_p2[kmhmh][0].scale_by(1.75)
+                if kamehameha_list_p2[kmhmh][2]:
+                    kamehameha_list_p2[kmhmh][0].flip()
+            if animation_frame_count_p2 == 0:
+                kamehameha_list_p2[kmhmh][1] = False
+        kamehameha_list_p2[kmhmh][0].x += 8 - 16*(kamehameha_list_p2[kmhmh][2])
+        if -50 > kamehameha_list_p2[kmhmh][0].x or kamehameha_list_p2[kmhmh][0].x > CAMERA_WIDTH + 50:
+            kamehameha_list_p2.remove(kamehameha_list_p2[kmhmh])
+        kmhmh += 1
 
     # IMAGE CREATE PLAYER ONE
     # HITBOX CREATE PLAYER ONE
@@ -239,6 +269,19 @@ def tick(keys):
     playertwo.xspeed = playertwo.xspeed*.9
 
     # HITBOX DETECTION
+    for kmhmh in range(0,len(kamehameha_list_p2)):
+        if kamehameha_list_p2[kmhmh][0].touches(playerone_hitbox):
+            doublejump_p2 = False
+            if playeroneimage == goku_sprsheet[3] and kamehameha_list_p2[kmhmh][2] != facing_left_p1:
+                playerone.xspeed = 2 - (4 * kamehameha_list_p2[kmhmh][2])
+            else:
+                playeroneimage = goku_sprsheet[4]
+                animation_frame_count_p1 = 20
+                playerone.xspeed = 5 - (10 * kamehameha_list_p2[kmhmh][2])
+            if kamehameha_list_p2[kmhmh][2] and playertwoimage != goku_sprsheet[3]:
+                facing_left_p1 = False
+            elif not kamehameha_list_p2[kmhmh][2] and playertwoimage != goku_sprsheet[3]:
+                facing_left_p1 = True
     if attackbox_p2.touches(playerone_hitbox) and not on_hit_p1:
         on_hit_p1 = True
         doublejump_p2 = False
@@ -330,6 +373,8 @@ def tick(keys):
     camera.draw(playertwo)
     for kmhmh in range(0, len(kamehameha_list_p1)):
         camera.draw(kamehameha_list_p1[kmhmh][0])
+    for kmhmh in range(0, len(kamehameha_list_p2)):
+        camera.draw(kamehameha_list_p2[kmhmh][0])
     camera.display()
 
 
