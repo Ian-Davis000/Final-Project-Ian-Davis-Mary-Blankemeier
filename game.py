@@ -9,6 +9,7 @@ CAMERA_WIDTH, CAMERA_HEIGHT = 1000, 600
 camera = gamebox.Camera(CAMERA_WIDTH, CAMERA_HEIGHT)
 ticks = 0
 background = gamebox.from_color(500, 570, "green", 2000, 50)
+sidewalls = [gamebox.from_color(-100, 300, "green", 200, 1500), gamebox.from_color(1100, 300, "green", 200, 1500)]
 music = gamebox.load_sound("Boss 5.ogg")
 backgroundscreen = gamebox.from_image(500, 200, "DBZBackground.png")
 backgroundscreen.scale_by(1.7)
@@ -235,6 +236,9 @@ def tick(keys):
     playerone.x = playerone.x + playerone.xspeed
     if playerone.bottom_touches(background):
         playerone.move_to_stop_overlapping(background)
+    for sidewall in sidewalls:
+        if playerone.touches(sidewall):
+            playerone.move_to_stop_overlapping(sidewall)
 
     if playerone.y >= background.y - 70 and 'airborne' in status_affects_p1:
         status_affects_p1.remove('airborne')
@@ -263,13 +267,16 @@ def tick(keys):
     playertwo.x = playertwo.x + playertwo.xspeed
     if playertwo.bottom_touches(background):
         playertwo.move_to_stop_overlapping(background)
+    for sidewall in sidewalls:
+        if playertwo.touches(sidewall):
+            playertwo.move_to_stop_overlapping(sidewall)
 
     if playertwo.y >= background.y - 70 and 'airborne' in status_affects_p2:
         status_affects_p2.remove('airborne')
     playertwo.xspeed = playertwo.xspeed*.9
 
     # HITBOX DETECTION
-    for kmhmh in range(0,len(kamehameha_list_p2)):
+    for kmhmh in range(0, len(kamehameha_list_p2)):
         if kamehameha_list_p2[kmhmh][0].touches(playerone_hitbox):
             doublejump_p2 = False
             if playeroneimage == goku_sprsheet[3] and kamehameha_list_p2[kmhmh][2] != facing_left_p1:
@@ -302,7 +309,7 @@ def tick(keys):
         elif not facing_left_p2 and playeroneimage != goku_sprsheet[3]:
             facing_left_p1 = True
 
-    for kmhmh in range(0,len(kamehameha_list_p1)):
+    for kmhmh in range(0, len(kamehameha_list_p1)):
         if kamehameha_list_p1[kmhmh][0].touches(playertwo_hitbox):
             doublejump_p1 = False
             if playertwoimage == goku_sprsheet[3] and kamehameha_list_p1[kmhmh][2] != facing_left_p2:
