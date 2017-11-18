@@ -8,10 +8,10 @@ import math
 CAMERA_WIDTH, CAMERA_HEIGHT = 1000, 600
 camera = gamebox.Camera(CAMERA_WIDTH, CAMERA_HEIGHT)
 ticks = 0
-background = gamebox.from_color(500, 460, "green", 2000, 50)
+background = gamebox.from_color(500, 570, "green", 2000, 50)
 music = gamebox.load_sound("Boss 5.ogg")
-backgroundscreen = gamebox.from_image(550, 400, "sea-water-ocean-storm.jpg")
-backgroundscreen.scale_by(1)
+backgroundscreen = gamebox.from_image(500, 200, "DBZBackground.png")
+backgroundscreen.scale_by(1.7)
 goku_sprsheet = gamebox.load_sprite_sheet('Goku-sprite-sheet.png', 9, 11)
 
 playerone = gamebox.from_image(300, 0, goku_sprsheet[0])
@@ -165,7 +165,6 @@ def tick(keys):
             if animation_frame_count_p1 <= 20:
                 playeroneimage = goku_sprsheet[19]
                 attackbox_p1_exists = True
-                on_hit_p2 = False
             if animation_frame_count_p1 == 20:
                 kamehameha_list_p1[kmhmh][0].x = playerone.x+40-80*facing_left_p1
                 kamehameha_list_p1[kmhmh][0].y = playerone.y+10
@@ -181,6 +180,7 @@ def tick(keys):
         if -50 > kamehameha_list_p1[kmhmh][0].x or kamehameha_list_p1[kmhmh][0].x > CAMERA_WIDTH + 50:
             kamehameha_list_p1.remove(kamehameha_list_p1[kmhmh])
         kmhmh += 1
+
 
     # IMAGE CREATE PLAYER ONE
     # HITBOX CREATE PLAYER ONE
@@ -259,6 +259,19 @@ def tick(keys):
         elif not facing_left_p2 and playeroneimage != goku_sprsheet[3]:
             facing_left_p1 = True
 
+    for kmhmh in range(0,len(kamehameha_list_p1)):
+        if kamehameha_list_p1[kmhmh][0].touches(playertwo_hitbox):
+            doublejump_p1 = False
+            if playertwoimage == goku_sprsheet[3] and kamehameha_list_p1[kmhmh][2] != facing_left_p2:
+                playertwo.xspeed = 2 - (4 * kamehameha_list_p1[kmhmh][2])
+            else:
+                playertwoimage = goku_sprsheet[4]
+                animation_frame_count_p2 = 20
+                playertwo.xspeed = 5 - (10 * kamehameha_list_p1[kmhmh][2])
+            if kamehameha_list_p1[kmhmh][2] and playeroneimage != goku_sprsheet[3]:
+                facing_left_p2 = False
+            elif not kamehameha_list_p1[kmhmh][2] and playeroneimage != goku_sprsheet[3]:
+                facing_left_p2 = True
     if attackbox_p1.touches(playertwo_hitbox) and not on_hit_p2:
         on_hit_p2 = True
         doublejump_p1 = False
@@ -272,7 +285,7 @@ def tick(keys):
             animation_frame_count_p2 = 20
             playertwo.yspeed = -10
             playertwo.xspeed = 2 - (4 * facing_left_p1)
-        elif (playeroneimage == goku_sprsheet[5] or playeroneimage == goku_sprsheet[6]) and playertwoimage == goku_sprsheet[3] and facing_left_p1 != facing_left_p2:
+        elif playertwoimage == goku_sprsheet[3] and facing_left_p1 != facing_left_p2:
             playertwo.xspeed = 2 - (4 * facing_left_p1)
         if facing_left_p1 and playeroneimage != goku_sprsheet[3]:
             facing_left_p2 = False
@@ -305,7 +318,7 @@ def tick(keys):
 
     camera.draw(backgroundscreen)
     camera.draw(scoredisplay)
-    debug = True
+    debug = False
     if debug:
         camera.draw(playerone_hitbox)
         camera.draw(playertwo_hitbox)
