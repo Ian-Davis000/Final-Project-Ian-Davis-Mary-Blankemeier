@@ -14,6 +14,7 @@ music = gamebox.load_sound("Boss 5.ogg")
 backgroundscreen = gamebox.from_image(500, 200, "DBZBackground.png")
 backgroundscreen.scale_by(1.7)
 goku_sprsheet = gamebox.load_sprite_sheet('Goku-sprite-sheet.png', 9, 11)
+kamehameha_sprsheet = gamebox.load_sprite_sheet('Kamehameha-blast-2.png', 1, 9)
 
 playerone = gamebox.from_image(300, 0, goku_sprsheet[0])
 playerone.scale_by(1.75)
@@ -42,7 +43,7 @@ kamehameha_list_p2 = []
 
 
 def tick(keys):
-    global ticks, goku_sprsheet
+    global ticks, goku_sprsheet, kamehameha_sprsheet
     global playeroneimage, playerone, status_affects_p1, facing_left_p1, animation_frame_count_p1, attackbox_p1_exists
     global attackbox_p1, on_hit_p1, attack_cooldown_p1, doublejump_p1, kamehameha_list_p1
     global playertwoimage, playertwo, status_affects_p2, facing_left_p2, animation_frame_count_p2, attackbox_p2_exists
@@ -176,14 +177,14 @@ def tick(keys):
                 kamehameha_list_p1[kmhmh][0].x = playerone.x+40-80*facing_left_p1
                 kamehameha_list_p1[kmhmh][0].y = playerone.y+10
                 kamehameha_list_p1[kmhmh][2] = facing_left_p1
-            if animation_frame_count_p1 < 20:
-                kamehameha_list_p1[kmhmh][0] = gamebox.from_image(kamehameha_list_p1[kmhmh][0].x, kamehameha_list_p1[kmhmh][0].y, 'kamehameha-charge.png')
-                kamehameha_list_p1[kmhmh][0].scale_by(1.75)
-                if kamehameha_list_p1[kmhmh][2]:
-                    kamehameha_list_p1[kmhmh][0].flip()
             if animation_frame_count_p1 == 0:
                 kamehameha_list_p1[kmhmh][1] = False
+        kamehameha_image = kamehameha_sprsheet[math.floor(ticks//5 % 9)]
+        kamehameha_list_p1[kmhmh][0] = gamebox.from_image(kamehameha_list_p1[kmhmh][0].x, kamehameha_list_p1[kmhmh][0].y, kamehameha_image)
         kamehameha_list_p1[kmhmh][0].x += 8 - 16*(kamehameha_list_p1[kmhmh][2])
+        kamehameha_list_p1[kmhmh][0].scale_by(1.75)
+        if kamehameha_list_p1[kmhmh][2]:
+            kamehameha_list_p1[kmhmh][0].flip()
         if -50 > kamehameha_list_p1[kmhmh][0].x or kamehameha_list_p1[kmhmh][0].x > CAMERA_WIDTH + 50:
             kamehameha_list_p1.remove(kamehameha_list_p1[kmhmh])
         kmhmh += 1
@@ -201,14 +202,14 @@ def tick(keys):
                 kamehameha_list_p2[kmhmh][0].x = playertwo.x+40-80*facing_left_p2
                 kamehameha_list_p2[kmhmh][0].y = playertwo.y+10
                 kamehameha_list_p2[kmhmh][2] = facing_left_p2
-            if animation_frame_count_p2 < 20:
-                kamehameha_list_p2[kmhmh][0] = gamebox.from_image(kamehameha_list_p2[kmhmh][0].x, kamehameha_list_p2[kmhmh][0].y, 'kamehameha-charge.png')
-                kamehameha_list_p2[kmhmh][0].scale_by(1.75)
-                if kamehameha_list_p2[kmhmh][2]:
-                    kamehameha_list_p2[kmhmh][0].flip()
             if animation_frame_count_p2 == 0:
                 kamehameha_list_p2[kmhmh][1] = False
+        kamehameha_image = kamehameha_sprsheet[math.floor(ticks//5 % 9)]
+        kamehameha_list_p2[kmhmh][0] = gamebox.from_image(kamehameha_list_p2[kmhmh][0].x, kamehameha_list_p2[kmhmh][0].y, kamehameha_image)
         kamehameha_list_p2[kmhmh][0].x += 8 - 16*(kamehameha_list_p2[kmhmh][2])
+        kamehameha_list_p2[kmhmh][0].scale_by(1.75)
+        if kamehameha_list_p2[kmhmh][2]:
+            kamehameha_list_p2[kmhmh][0].flip()
         if -50 > kamehameha_list_p2[kmhmh][0].x or kamehameha_list_p2[kmhmh][0].x > CAMERA_WIDTH + 50:
             kamehameha_list_p2.remove(kamehameha_list_p2[kmhmh])
         kmhmh += 1
