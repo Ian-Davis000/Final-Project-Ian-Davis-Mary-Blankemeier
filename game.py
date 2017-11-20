@@ -1,6 +1,9 @@
 # Ian Davis jid7da Fighting Game
 # Mary Blankemeier mhb5zf
 # Sprites by AngryBoy on DBZVortex
+# Splash Screen from
+#
+# Music from Dragon Ball
 
 import gamebox
 import pygame
@@ -56,11 +59,17 @@ character_select = False
 def splash(keys):
     global show_splash
     global character_select
+    global ticks
+    if ticks == 0:
+        pygame.mixer.music.load("Piccolos Theme.ogg")
+        pygame.mixer.music.play(-1)
     camera.draw(splash_screen)
     camera.display()
     if keys:
         show_splash = False
         character_select = True
+        ticks = -1
+    ticks += 1
 
 
 character_select_pic = gamebox.from_image(CAMERA_WIDTH/2, CAMERA_HEIGHT/2, 'Goku-Vegeta.png')
@@ -72,7 +81,10 @@ icons = gamebox.load_sprite_sheet('Icons.png', 1, 10)
 
 
 def character_select_screen(keys):
-    global character_select, character_p1, character_p2
+    global character_select, character_p1, character_p2, ticks
+    if ticks == 0:
+        pygame.mixer.music.load("Perfect Cell Theme.ogg")
+        pygame.mixer.music.play(-1)
     if pygame.K_LEFT in keys:
         character_p1 -= 1
     if pygame.K_RIGHT in keys:
@@ -81,8 +93,9 @@ def character_select_screen(keys):
         character_p2 -= 1
     if pygame.K_d in keys:
         character_p2 += 1
-    if pygame.K_SPACE in keys:
+    if keys.difference({pygame.K_LEFT, pygame.K_RIGHT, pygame.K_a, pygame.K_d}):
         character_select = False
+        ticks = -1
     keys.clear()
     character1 = gamebox.from_image(100, 350, icons[character_p1%2])
     character2 = gamebox.from_image(300, 350, icons[character_p2%2])
@@ -92,7 +105,7 @@ def character_select_screen(keys):
     camera.draw(character1)
     camera.draw(character2)
     camera.display()
-
+    ticks += 1
 
 def tick(keys):
     global ticks, goku_sprsheet, goku_sprsheet_red, kamehameha_sprsheet, kamehameha
