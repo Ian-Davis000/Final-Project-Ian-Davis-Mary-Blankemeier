@@ -10,12 +10,14 @@ camera = gamebox.Camera(CAMERA_WIDTH, CAMERA_HEIGHT)
 ticks = 0
 background = gamebox.from_color(500, 570, "green", 2000, 50)
 sidewalls = [gamebox.from_color(-100, 300, "green", 200, 1500), gamebox.from_color(1100, 300, "green", 200, 1500)]
-music = gamebox.load_sound("Boss 5.ogg")
+music = gamebox.load_sound("Boss-5-looped.ogg")
+kamehameha = gamebox.load_sound("Kamehameha.ogg")
 backgroundscreen = gamebox.from_image(500, 200, "DBZBackground.png")
 backgroundscreen.scale_by(1.7)
 goku_sprsheet = gamebox.load_sprite_sheet('Goku-sprite-sheet.png', 9, 11)
 goku_sprsheet_red = gamebox.load_sprite_sheet('Goku-sprite-sheet-red.png', 9, 11)
 kamehameha_sprsheet = gamebox.load_sprite_sheet('Kamehameha-blast-2.png', 1, 9)
+transform_sprsheet = gamebox.load_sprite_sheet('Goku-Saiyan-Transformation.png', 3, 5)
 
 playerone = gamebox.from_image(300, 0, goku_sprsheet[0])
 playerone.scale_by(1.75)
@@ -24,13 +26,16 @@ facing_left_p1 = False
 animation_frame_count_p1 = 0
 attackbox_p1_exists = False
 attackbox_p1 = gamebox.from_color(-100, -100, 'red', 1, 1)
-attackboxes_p1 = []
 on_hit_p1 = False
 attack_cooldown_p1 = 0
 doublejump_p1 = False
 kamehameha_list_p1 = []
+on_press_p1 = False
+charge_p1 = 0
+transform_bar_p1 = 0
+transform_bar1_p1 = 0
 
-playertwo = gamebox.from_image(700, 0, goku_sprsheet[0])
+playertwo = gamebox.from_image(700, 0, goku_sprsheet_red[0])
 playerone.scale_by(1.75)
 status_affects_p2 = []
 facing_left_p2 = True
@@ -42,14 +47,18 @@ attack_cooldown_p2 = 0
 doublejump_p2 = False
 kamehameha_list_p2 = []
 
+pygame.mixer.music.load("Boss-5-looped.ogg")
+pygame.mixer.music.play(-1)
+
 
 def tick(keys):
-    global ticks, goku_sprsheet, goku_sprsheet_red, kamehameha_sprsheet
+    global ticks, goku_sprsheet, goku_sprsheet_red, kamehameha_sprsheet, kamehameha
     global playeroneimage, playerone, status_affects_p1, facing_left_p1, animation_frame_count_p1, attackbox_p1_exists
-    global attackbox_p1, on_hit_p1, attack_cooldown_p1, doublejump_p1, kamehameha_list_p1
+    global attackbox_p1, on_hit_p1, attack_cooldown_p1, doublejump_p1, kamehameha_list_p1, on_press_p1, charge_p1
+    global transform_bar_p1, transform_bar1_p1
     global playertwoimage, playertwo, status_affects_p2, facing_left_p2, animation_frame_count_p2, attackbox_p2_exists
     global attackbox_p2, on_hit_p2, attack_cooldown_p2, doublejump_p2, kamehameha_list_p2
-    music.play(-1)
+    #music.play(-1)
     ticks += 1
     scoredisplay = gamebox.from_text(0, 0, "SCORE: " + str(ticks // 30), "Arial", 14, "red", italic=True)
     scoredisplay.top = camera.top
@@ -134,9 +143,25 @@ def tick(keys):
     if pygame.K_COMMA in keys and animation_frame_count_p1 == 0 and attack_cooldown_p1 == 0:
         if pygame.K_RIGHT in keys or pygame.K_LEFT in keys:
             animation_frame_count_p1 = 60
+            pygame.mixer.Channel(1).play(pygame.mixer.Sound('Kamehameha.ogg'))
             kamehameha_list_p1.append([gamebox.from_color(-30, -100, 'red', 1, 1), True, False])
+    if pygame.K_COMMA in keys and animation_frame_count_p1 == 0 and attack_cooldown_p1 == 0:
+        if pygame.K_DOWN in keys:
+            playeroneimage = transform_sprsheet[ticks//5 % 2]
+            charge_p1 += .085
+            transform_bar_p1 = gamebox.from_color(playerone.x+charge_p1/2-25, playerone.y+20, 'white', charge_p1, 4)
+            transform_bar1_p1 = gamebox.from_color(playerone.x-5, playerone.y+20, 'black', 42, 6)
+            if on_press_p1:
+                on_press_p1 = False
+                pygame.mixer.Channel(1).play(pygame.mixer.Sound('Goku Screaming.ogg'))
+    if pygame.K_DOWN not in keys or playeroneimage not in transform_sprsheet:
+        on_press_p1 = True
+        transform_bar_p1 = 0
+        transform_bar1_p1 = 0
+        if not kamehameha_list_p1:
+            pygame.mixer.Channel(1).stop()
 
-    # ATTACKS PLAYER TWO
+        # ATTACKS PLAYER TWO
     if pygame.K_LSHIFT in keys and animation_frame_count_p2 == 0 and attack_cooldown_p2 == 0:
         if pygame.K_d in keys or pygame.K_a in keys:
             playertwoimage = goku_sprsheet_red[5]
@@ -157,6 +182,7 @@ def tick(keys):
     if pygame.K_LCTRL in keys and animation_frame_count_p2 == 0 and attack_cooldown_p2 == 0:
         if pygame.K_a in keys or pygame.K_d in keys:
             animation_frame_count_p2 = 60
+            pygame.mixer.Channel(2).play(pygame.mixer.Sound('Kamehameha.ogg'))
             kamehameha_list_p2.append([gamebox.from_color(-30, -100, 'red', 1, 1), True, False])
 
     # REMOVES JUMP KEY TO ALLOW DOUBLE JUMP - MUST GO AFTER ATTACKS
@@ -380,6 +406,10 @@ def tick(keys):
             camera.draw(attackbox_p1)
     camera.draw(playerone)
     camera.draw(playertwo)
+    if transform_bar1_p1 != 0:
+        camera.draw(transform_bar1_p1)
+    if transform_bar_p1 != 0:
+        camera.draw(transform_bar_p1)
     for kmhmh in range(0, len(kamehameha_list_p1)):
         camera.draw(kamehameha_list_p1[kmhmh][0])
     for kmhmh in range(0, len(kamehameha_list_p2)):
