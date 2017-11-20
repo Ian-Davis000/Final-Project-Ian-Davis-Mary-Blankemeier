@@ -66,7 +66,7 @@ def splash(keys):
     if keys:
         show_splash = False
         character_select = True
-        pygame.mixer.Channel(1).play(pygame.mixer.Sound('misc_menu_4.wav'))
+        #pygame.mixer.Channel(1).play(pygame.mixer.Sound('misc_menu_4.wav'))
         ticks = -1
     ticks += 1
 
@@ -76,7 +76,7 @@ character_select_pic.height = camera.height
 character_list = ['Goku-sprite-sheet.png','Goku-sprite-sheet-red.png']
 character_p1 = 0
 character_p2 = 0
-icons = gamebox.load_sprite_sheet('Icons.png', 1, 10)
+icons = gamebox.load_sprite_sheet('Big Icons.png', 1, 10)
 select_highlight_toggle_p1 = False
 select_highlight_toggle_p2 = False
 
@@ -119,8 +119,6 @@ def character_select_screen(keys):
     select_highlight_p2 = gamebox.from_color(300, 350, 'gold', 130, 178)
     character1 = gamebox.from_image(100, 350, icons[character_p1%2])
     character2 = gamebox.from_image(300, 350, icons[character_p2%2])
-    character1.scale_by(3)
-    character2.scale_by(3)
     camera.draw(character_select_pic)
     if select_highlight_toggle_p1:
         camera.draw(select_highlight_p1)
@@ -240,9 +238,13 @@ def tick(keys):
     if pygame.K_COMMA in keys and animation_frame_count_p1 == 0 and attack_cooldown_p1 == 0:
         if pygame.K_DOWN in keys:
             playeroneimage = transform_sprsheet[ticks//5 % 2]
-            charge_p1 += .085
+            charge_p1 += 40/480
             transform_bar_p1 = gamebox.from_color(playerone.x+charge_p1/2-25+10*facing_left_p1, playerone.y+20, 'white', charge_p1, 4)
             transform_bar1_p1 = gamebox.from_color(playerone.x-5+10*facing_left_p1, playerone.y+20, 'black', 42, 6)
+            if charge_p1 >= 40:
+                charge_p1 = 0
+                sprsheet_p1 = gamebox.load_sprite_sheet('goku-ss-sprite-sheet.png', 9, 11)
+                keys.remove(pygame.K_DOWN)
             if on_press_p1:
                 on_press_p1 = False
                 pygame.mixer.Channel(1).play(pygame.mixer.Sound('Goku Screaming.ogg'))
@@ -282,6 +284,10 @@ def tick(keys):
             charge_p2 += .085
             transform_bar_p2 = gamebox.from_color(playertwo.x+charge_p2/2-25+10*facing_left_p2, playertwo.y+20, 'white', charge_p2, 4)
             transform_bar1_p2 = gamebox.from_color(playertwo.x-5+10*facing_left_p2, playertwo.y+20, 'black', 42, 6)
+            if charge_p2 >= 40:
+                charge_p2 = 0
+                sprsheet_p2 = gamebox.load_sprite_sheet('goku-ss-sprite-sheet.png', 9, 11)
+                keys.remove(pygame.K_s)
             if on_press_p2:
                 on_press_p2 = False
                 pygame.mixer.Channel(2).play(pygame.mixer.Sound('Goku Screaming.ogg'))
