@@ -47,8 +47,51 @@ attack_cooldown_p2 = 0
 doublejump_p2 = False
 kamehameha_list_p2 = []
 
-pygame.mixer.music.load("Boss-5-looped.ogg")
-pygame.mixer.music.play(-1)
+splash_screen = gamebox.from_image(CAMERA_WIDTH/2, CAMERA_HEIGHT/2+20, 'Goku-VS-Frieza.png')
+splash_screen.width = camera.width
+show_splash = True
+character_select = False
+
+
+def splash(keys):
+    global show_splash
+    global character_select
+    camera.draw(splash_screen)
+    camera.display()
+    if keys:
+        show_splash = False
+        character_select = True
+
+
+character_select_pic = gamebox.from_image(CAMERA_WIDTH/2, CAMERA_HEIGHT/2, 'Goku-Vegeta.png')
+character_select_pic.height = camera.height
+character_list = ['Goku-sprite-sheet.png','Goku-sprite-sheet-red.png']
+character_p1 = 0
+character_p2 = 0
+icons = gamebox.load_sprite_sheet('Icons.png', 1, 10)
+
+
+def character_select_screen(keys):
+    global character_select, character_p1, character_p2
+    if pygame.K_LEFT in keys:
+        character_p1 -= 1
+    if pygame.K_RIGHT in keys:
+        character_p1 += 1
+    if pygame.K_a in keys:
+        character_p2 -= 1
+    if pygame.K_d in keys:
+        character_p2 += 1
+    if pygame.K_SPACE in keys:
+        character_select = False
+    keys.clear()
+    character1 = gamebox.from_image(100, 350, icons[character_p1%2])
+    character2 = gamebox.from_image(300, 350, icons[character_p2%2])
+    character1.scale_by(3)
+    character2.scale_by(3)
+    camera.draw(character_select_pic)
+    camera.draw(character1)
+    camera.draw(character2)
+    camera.display()
 
 
 def tick(keys):
@@ -58,7 +101,17 @@ def tick(keys):
     global transform_bar_p1, transform_bar1_p1
     global playertwoimage, playertwo, status_affects_p2, facing_left_p2, animation_frame_count_p2, attackbox_p2_exists
     global attackbox_p2, on_hit_p2, attack_cooldown_p2, doublejump_p2, kamehameha_list_p2
-    #music.play(-1)
+    if show_splash:
+        splash(keys)
+        keys.clear()
+        return
+    if character_select:
+        character_select_screen(keys)
+        keys.clear()
+        return
+    if ticks == 0:
+        pygame.mixer.music.load("Boss-5-looped.ogg")
+        pygame.mixer.music.play(-1)
     ticks += 1
     scoredisplay = gamebox.from_text(0, 0, "SCORE: " + str(ticks // 30), "Arial", 14, "red", italic=True)
     scoredisplay.top = camera.top
